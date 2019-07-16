@@ -1,0 +1,13 @@
+{
+  "shirtConfig": [{
+  	"id": 123,
+    "leftShoulder": {
+      "x": 210,
+      "y": 150
+    },
+    "rightShoulder": {
+      "x": 580,
+      "y": 150
+    }
+  }] 
+}
