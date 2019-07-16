@@ -22,7 +22,7 @@ function setup() {
     }); */
 
     poseNet = ml5.poseNet(video, modelReady);
-    poseNet.on('pose', gotPoses)
+    poseNet.on('pose', gotPoses);
 }
 
 function gotPoses(poses) {
@@ -38,9 +38,19 @@ function modelReady() {
 }
 
 function draw() {
-  background(220)
+    background(220);
+    image(video, 0, 0);
+    drawKeypoints();
+    drawSkeleton();
+}
+
+function drawSkeleton() {
+    stroke(126)
+    line(leftShoulderX, leftShoulderY, rightShoulderX, rightShoulderY)
+}
+
+function drawKeypoints() {
     noStroke();
-    image(video, 0, 0)
     fill(0, 255, 255);
     ellipse(leftShoulderX, leftShoulderY, 10);
     ellipse(rightShoulderX, rightShoulderY, 10);
