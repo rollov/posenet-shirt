@@ -26,10 +26,20 @@ function setup() {
 }
 
 function gotPoses(poses) {
-    leftShoulderX = poses[0].pose.keypoints[5].position.x;
-    leftShoulderY = poses[0].pose.keypoints[5].position.y;
-    rightShoulderX = poses[0].pose.keypoints[6].position.x;
-    rightShoulderY = poses[0].pose.keypoints[6].position.y;
+    if (poses.length > 0) {
+        let newLX = poses[0].pose.keypoints[5].position.x;
+        let newLY = poses[0].pose.keypoints[5].position.y;
+        let newRX = poses[0].pose.keypoints[6].position.x;
+        let newRY = poses[0].pose.keypoints[6].position.y;
+        leftShoulderX = lerp(leftShoulderX, newLX, 0.2);
+        leftShoulderY = lerp(leftShoulderY, newLY, 0.2);
+        rightShoulderX = lerp(rightShoulderX, newRX, 0.2);
+        rightShoulderY = lerp(rightShoulderY, newRY, 0.2);     
+        let a = rightShoulderX - leftShoulderX;
+        let b = Math.abs(leftShoulderY - rightShoulderY);
+        calcHypotenuse(a, b);
+        //console.log();
+    }
 }
 
 function modelReady() {
@@ -54,4 +64,8 @@ function drawKeypoints() {
     fill(0, 255, 255);
     ellipse(leftShoulderX, leftShoulderY, 10);
     ellipse(rightShoulderX, rightShoulderY, 10);
+}
+
+function calcHypotenuse(a, b) {
+  return Math.sqrt(a*a + b*b);
 }
