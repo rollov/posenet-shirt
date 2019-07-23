@@ -5,13 +5,23 @@ let leftShoulderX = 0;
 let leftShoulderY = 0;
 let rightShoulderX = 0;
 let rightShoulderY = 0;
-let imageName = "model-tshirt";
+let shirtPath = "/images/tshirt.png";
+let shirtShoulderWidth = 0;
+let scaleFactor = 0;
+let shirtConfig;
+
+$.getJSON("shirtConfig.json", function(json) {
+    shirtConfig = json.shirtConfig[0];
+});
+
+function preload() {
+    img = loadImage(shirtPath);
+}
 
 function setup() {
-
-    createCanvas(640, 480)
-    video = createCapture(VIDEO)
-    video.hide()
+    createCanvas(640, 480);
+    video = createCapture(VIDEO);
+    video.hide();
 
     //img = document.getElementById("tshirt");
     //img.hidden = true;
@@ -21,6 +31,7 @@ function setup() {
         image(img, 0, 0);
     }); */
 
+    shirtShoulderWidth = shirtConfig.leftShoulder.x - shirtConfig.rightShoulder.x;
     poseNet = ml5.poseNet(video, modelReady);
     poseNet.on('pose', gotPoses);
 }
@@ -35,16 +46,15 @@ function gotPoses(poses) {
         leftShoulderY = lerp(leftShoulderY, newLY, 0.2);
         rightShoulderX = lerp(rightShoulderX, newRX, 0.2);
         rightShoulderY = lerp(rightShoulderY, newRY, 0.2);     
-        let a = rightShoulderX - leftShoulderX;
-        let b = Math.abs(leftShoulderY - rightShoulderY);
-        calcHypotenuse(a, b);
-        //console.log();
+        let a = leftShoulderX - rightShoulderX;
+        let b = Math.abs(rightShoulderY - leftShoulderY);
+        let hypo = calcHypotenuse(a, b);
+        scaleFactor = calcScaleFactor(hypo);
     }
 }
 
 function modelReady() {
     console.log("model ready");
-    //poseNet.singlePose(video);
 }
 
 function draw() {
@@ -52,11 +62,27 @@ function draw() {
     image(video, 0, 0);
     drawKeypoints();
     drawSkeleton();
+    drawTShirt()
+}
+
+function drawTShirt() {
+    let size;
+    let posX;
+    let posY;
+    if (scaleFactor >= 1) {
+        size = shirtConfig.size / scaleFactor;
+        posX = rightShoulderX - (shirtConfig.rightShoulder.x / scaleFactor);
+        posY = rightShoulderY - (shirtConfig.rightShoulder.y / scaleFactor);
+    } else {
+        size = shirtConfig.size * scaleFactor;
+    }
+
+    image(img, posX, posY, size, size);
 }
 
 function drawSkeleton() {
-    stroke(126)
-    line(leftShoulderX, leftShoulderY, rightShoulderX, rightShoulderY)
+    stroke(126);
+    line(leftShoulderX, leftShoulderY, rightShoulderX, rightShoulderY);
 }
 
 function drawKeypoints() {
@@ -68,4 +94,8 @@ function drawKeypoints() {
 
 function calcHypotenuse(a, b) {
   return Math.sqrt(a*a + b*b);
+}
+
+function calcScaleFactor(hypo) {
+    return (shirtShoulderWidth * 1.0)/hypo
 }
