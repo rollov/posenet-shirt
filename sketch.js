@@ -79,12 +79,12 @@ function drawTShirt() {
         size = shirtConfig.size * scaleFactor;
     }
 
-    //push();
-    //translate(posX, posY);
-    //rotate(radians *-1);
-
+    image(img, posX, posY, size, size);
+    /* push();
+    translate(posX, posY);
+    rotate(radians *-1);
     image(img, 0, 0, size, size);
-    //pop();
+    pop(); */
 }
 
 function drawSkeleton() {
