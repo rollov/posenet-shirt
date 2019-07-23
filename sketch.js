@@ -10,6 +10,7 @@ let shirtShoulderWidth = 0;
 let scaleFactor = 0;
 let shirtConfig;
 let radians = 0;
+let lerpAmount = 0.1;
 
 $.getJSON("shirtConfig.json", function(json) {
     shirtConfig = json.shirtConfig[0];
@@ -43,10 +44,10 @@ function gotPoses(poses) {
         let newLY = poses[0].pose.keypoints[5].position.y;
         let newRX = poses[0].pose.keypoints[6].position.x;
         let newRY = poses[0].pose.keypoints[6].position.y;
-        leftShoulderX = lerp(leftShoulderX, newLX, 0.1);
-        leftShoulderY = lerp(leftShoulderY, newLY, 0.1);
-        rightShoulderX = lerp(rightShoulderX, newRX, 0.1);
-        rightShoulderY = lerp(rightShoulderY, newRY, 0.1);
+        leftShoulderX = lerp(leftShoulderX, newLX, lerpAmount);
+        leftShoulderY = lerp(leftShoulderY, newLY, lerpAmount);
+        rightShoulderX = lerp(rightShoulderX, newRX, lerpAmount);
+        rightShoulderY = lerp(rightShoulderY, newRY, lerpAmount);
         let b = leftShoulderX - rightShoulderX;
         let a = rightShoulderY - leftShoulderY;
         let c = calcHypotenuse(Math.abs(a), b);
@@ -79,12 +80,11 @@ function drawTShirt() {
         size = shirtConfig.size * scaleFactor;
     }
 
-    image(img, posX, posY, size, size);
-    /* push();
+    push();
     translate(posX, posY);
     rotate(radians *-1);
     image(img, 0, 0, size, size);
-    pop(); */
+    pop();
 }
 
 function drawSkeleton() {
