@@ -9,6 +9,7 @@ let shirtPath = "/images/tshirt.png";
 let shirtShoulderWidth = 0;
 let scaleFactor = 0;
 let shirtConfig;
+let radians = 0;
 
 $.getJSON("shirtConfig.json", function(json) {
     shirtConfig = json.shirtConfig[0];
@@ -42,14 +43,15 @@ function gotPoses(poses) {
         let newLY = poses[0].pose.keypoints[5].position.y;
         let newRX = poses[0].pose.keypoints[6].position.x;
         let newRY = poses[0].pose.keypoints[6].position.y;
-        leftShoulderX = lerp(leftShoulderX, newLX, 0.2);
-        leftShoulderY = lerp(leftShoulderY, newLY, 0.2);
-        rightShoulderX = lerp(rightShoulderX, newRX, 0.2);
-        rightShoulderY = lerp(rightShoulderY, newRY, 0.2);     
-        let a = leftShoulderX - rightShoulderX;
-        let b = Math.abs(rightShoulderY - leftShoulderY);
-        let hypo = calcHypotenuse(a, b);
-        scaleFactor = calcScaleFactor(hypo);
+        leftShoulderX = lerp(leftShoulderX, newLX, 0.1);
+        leftShoulderY = lerp(leftShoulderY, newLY, 0.1);
+        rightShoulderX = lerp(rightShoulderX, newRX, 0.1);
+        rightShoulderY = lerp(rightShoulderY, newRY, 0.1);
+        let b = leftShoulderX - rightShoulderX;
+        let a = rightShoulderY - leftShoulderY;
+        let c = calcHypotenuse(Math.abs(a), b);
+        scaleFactor = calcScaleFactor(c);
+        radians = calcRadians(a, c);
     }
 }
 
@@ -60,9 +62,9 @@ function modelReady() {
 function draw() {
     background(220);
     image(video, 0, 0);
+    drawTShirt();
     drawKeypoints();
     drawSkeleton();
-    drawTShirt()
 }
 
 function drawTShirt() {
@@ -77,7 +79,12 @@ function drawTShirt() {
         size = shirtConfig.size * scaleFactor;
     }
 
-    image(img, posX, posY, size, size);
+    //push();
+    //translate(posX, posY);
+    //rotate(radians *-1);
+
+    image(img, 0, 0, size, size);
+    //pop();
 }
 
 function drawSkeleton() {
@@ -96,6 +103,14 @@ function calcHypotenuse(a, b) {
   return Math.sqrt(a*a + b*b);
 }
 
-function calcScaleFactor(hypo) {
-    return (shirtShoulderWidth * 1.0)/hypo
+function calcScaleFactor(c) {
+    return (shirtShoulderWidth * 1.0)/c
+}
+
+function calcRadians(a, c) {
+    return Math.asin(a / c);
+}
+
+function toDegrees (angle) {
+    return angle * (180 / Math.PI);
 }
